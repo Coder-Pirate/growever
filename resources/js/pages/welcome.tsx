@@ -63,7 +63,7 @@ function HeroSection({ content }: { content: SiteContent['hero'] }) {
 export default function Welcome({ siteContent }: { siteContent: SiteContent }) {
     return (
         <>
-            <Head title="Grow Ever — Digital Agency">
+            <Head title="Digital Agency">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
             </Head>

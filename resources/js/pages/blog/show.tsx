@@ -40,7 +40,7 @@ export default function BlogShow() {
 
     return (
         <>
-            <Head title={`${blog.title} — Grow Ever`}>
+            <Head title={blog.title}>
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
             </Head>
