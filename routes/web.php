@@ -2,15 +2,19 @@
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportUsersController;
+use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', function () {
+    return Inertia\Inertia::render('welcome', [
+        'canRegister' => Features::enabled(Features::registration()),
+        'siteContent' => \App\Models\SiteContent::getAllSections(),
+    ]);
+})->name('home');
 
 // Redirect /dashboard to the correct role-based dashboard
 Route::middleware(['auth', 'verified'])->get('dashboard', function () {
@@ -29,6 +33,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('users/export/excel', [ExportUsersController::class, 'excel'])->name('users.export.excel');
     Route::get('users/export/pdf', [ExportUsersController::class, 'pdf'])->name('users.export.pdf');
     Route::resource('users', UserController::class)->except(['show']);
+    Route::get('site-content', [SiteContentController::class, 'index'])->name('site-content.index');
+    Route::put('site-content/{section}', [SiteContentController::class, 'update'])->name('site-content.update');
 });
 
 // Manager routes

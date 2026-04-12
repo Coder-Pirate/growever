@@ -23,9 +23,22 @@ import {
     TrendingUp,
     Moon,
     Sun,
+    Shield,
+    type LucideIcon,
 } from 'lucide-react';
 import { useState, FormEvent } from 'react';
 import { useAppearance } from '@/hooks/use-appearance';
+import type { SiteContent } from '@/types/site-content';
+
+const iconMap: Record<string, LucideIcon> = {
+    ShoppingCart, Globe, Layers, Search, Megaphone, BarChart3,
+    Code, Palette, TrendingUp, Users, Rocket, Mail, Phone,
+    MapPin, Star, CheckCircle2, ArrowRight, Shield,
+};
+
+function getIcon(name: string): LucideIcon {
+    return iconMap[name] || Code;
+}
 
 function Navbar({ auth, canRegister }: { auth: { user: unknown }; canRegister: boolean }) {
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -106,9 +119,9 @@ function Navbar({ auth, canRegister }: { auth: { user: unknown }; canRegister: b
                     >
                         {resolvedAppearance === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                     </button>
-                <button onClick={() => setMobileOpen(!mobileOpen)} className="text-neutral-700 dark:text-neutral-200">
-                    {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                </button>
+                    <button onClick={() => setMobileOpen(!mobileOpen)} className="text-neutral-700 dark:text-neutral-200">
+                        {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
                 </div>
             </div>
 
@@ -153,7 +166,7 @@ function Navbar({ auth, canRegister }: { auth: { user: unknown }; canRegister: b
     );
 }
 
-function HeroSection() {
+function HeroSection({ content }: { content: SiteContent['hero'] }) {
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -167,18 +180,17 @@ function HeroSection() {
                 <div className="mx-auto max-w-3xl text-center">
                     <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-sm font-medium text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
                         <Rocket className="h-4 w-4" />
-                        Digital Agency That Delivers Results
+                        {content.badge}
                     </div>
 
                     <h1 className="mb-6 text-4xl leading-tight font-extrabold tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl dark:text-white">
-                        We Build Digital
-                        <span className="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent"> Experiences </span>
-                        That Grow Your Business
+                        {content.title_line1}
+                        <span className="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent"> {content.title_highlight} </span>
+                        {content.title_line2}
                     </h1>
 
                     <p className="mx-auto mb-10 max-w-2xl text-lg text-neutral-600 dark:text-neutral-400">
-                        From modern e-commerce platforms to powerful web applications and result-driven digital marketing — we help businesses scale
-                        and succeed in the digital world.
+                        {content.description}
                     </p>
 
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -186,23 +198,18 @@ function HeroSection() {
                             onClick={() => scrollTo('contact')}
                             className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 transition-all hover:bg-sky-700 hover:shadow-xl hover:shadow-sky-500/30"
                         >
-                            Start Your Project <ArrowRight className="h-4 w-4" />
+                            {content.cta_primary} <ArrowRight className="h-4 w-4" />
                         </button>
                         <button
                             onClick={() => scrollTo('services')}
                             className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-8 py-3.5 text-sm font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
                         >
-                            Our Services <ChevronRight className="h-4 w-4" />
+                            {content.cta_secondary} <ChevronRight className="h-4 w-4" />
                         </button>
                     </div>
 
                     <div className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4">
-                        {[
-                            { value: '150+', label: 'Projects Delivered' },
-                            { value: '50+', label: 'Happy Clients' },
-                            { value: '5+', label: 'Years Experience' },
-                            { value: '99%', label: 'Client Satisfaction' },
-                        ].map((stat) => (
+                        {content.stats.map((stat) => (
                             <div key={stat.label}>
                                 <div className="text-2xl font-bold text-sky-600 lg:text-3xl dark:text-sky-400">{stat.value}</div>
                                 <div className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{stat.label}</div>
@@ -215,41 +222,37 @@ function HeroSection() {
     );
 }
 
-function AboutSection() {
+function AboutSection({ content }: { content: SiteContent['about'] }) {
     return (
         <section id="about" className="bg-neutral-50 py-20 lg:py-28 dark:bg-neutral-900/50">
             <div className="mx-auto max-w-7xl px-6">
                 <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
                     <div>
                         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-sm font-medium text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
-                            About Us
+                            {content.badge}
                         </div>
                         <h2 className="mb-6 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl dark:text-white">
-                            We Are <span className="text-sky-600 dark:text-sky-400">Grow Ever</span> — Your Digital Growth Partner
+                            {content.title_prefix} <span className="text-sky-600 dark:text-sky-400">{content.title_highlight}</span> {content.title_suffix}
                         </h2>
                         <p className="mb-6 leading-relaxed text-neutral-600 dark:text-neutral-400">
-                            Grow Ever is a full-service digital agency dedicated to helping businesses thrive online. We combine cutting-edge
-                            technology with creative strategy to deliver web solutions and marketing campaigns that drive real, measurable results.
+                            {content.paragraph1}
                         </p>
                         <p className="mb-8 leading-relaxed text-neutral-600 dark:text-neutral-400">
-                            Whether you need a high-converting e-commerce store, a custom web application, or a comprehensive digital marketing
-                            strategy — our team of passionate developers, designers, and marketers have got you covered.
+                            {content.paragraph2}
                         </p>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {[
-                                { icon: Code, text: 'Expert Development Team' },
-                                { icon: Palette, text: 'Modern UI/UX Design' },
-                                { icon: TrendingUp, text: 'Data-Driven Marketing' },
-                                { icon: Users, text: 'Dedicated Support' },
-                            ].map(({ icon: Icon, text }) => (
-                                <div key={text} className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400">
-                                        <Icon className="h-5 w-5" />
+                            {content.features.map(({ icon, text }) => {
+                                const Icon = getIcon(icon);
+                                return (
+                                    <div key={text} className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-900/50 dark:text-sky-400">
+                                            <Icon className="h-5 w-5" />
+                                        </div>
+                                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{text}</span>
                                     </div>
-                                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{text}</span>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -258,15 +261,9 @@ function AboutSection() {
                             <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10" />
                             <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-white/10" />
                             <div className="relative">
-                                <h3 className="mb-4 text-2xl font-bold">Why Choose Us?</h3>
+                                <h3 className="mb-4 text-2xl font-bold">{content.why_title}</h3>
                                 <ul className="space-y-4">
-                                    {[
-                                        'Custom solutions tailored to your business',
-                                        'Transparent communication & on-time delivery',
-                                        'SEO-optimized & performance-focused builds',
-                                        'Post-launch support & maintenance',
-                                        'Competitive pricing with premium quality',
-                                    ].map((item) => (
+                                    {content.why_items.map((item) => (
                                         <li key={item} className="flex items-start gap-3">
                                             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-sky-200" />
                                             <span className="text-white/90">{item}</span>
@@ -282,71 +279,25 @@ function AboutSection() {
     );
 }
 
-const services = [
-    {
-        icon: ShoppingCart,
-        title: 'E-Commerce Web Apps',
-        description:
-            'Build modern, scalable e-commerce platforms with seamless payment integration, inventory management, and beautiful storefronts that convert visitors into customers.',
-        features: ['Custom Storefront Design', 'Payment Gateway Integration', 'Inventory & Order Management', 'Mobile-Responsive'],
-    },
-    {
-        icon: Globe,
-        title: 'Business Web Applications',
-        description:
-            'Custom web applications tailored to your specific business needs — from CRM systems and dashboards to booking platforms and SaaS products.',
-        features: ['Custom CRM & Dashboards', 'SaaS Product Development', 'API Development & Integration', 'Cloud-Based Solutions'],
-    },
-    {
-        icon: Layers,
-        title: 'Portfolio & Corporate Websites',
-        description:
-            'Stunning, fast-loading websites for businesses, startups, and professionals that establish credibility and capture leads effectively.',
-        features: ['Modern Landing Pages', 'WordPress & Custom CMS', 'Blog & Content Systems', 'Brand-Aligned Design'],
-    },
-    {
-        icon: Search,
-        title: 'SEO Optimization',
-        description:
-            'Rank higher on Google and drive organic traffic with our proven SEO strategies including on-page, off-page, and technical SEO.',
-        features: ['On-Page & Off-Page SEO', 'Technical SEO Audits', 'Keyword Research', 'Content Strategy'],
-    },
-    {
-        icon: Megaphone,
-        title: 'Social Media Marketing',
-        description:
-            'Grow your brand presence across social platforms with targeted campaigns, engaging content, and community management that builds loyal audiences.',
-        features: ['Facebook & Instagram Ads', 'Content Creation', 'Community Management', 'Analytics & Reporting'],
-    },
-    {
-        icon: BarChart3,
-        title: 'PPC & Digital Advertising',
-        description:
-            'Maximize your ROI with data-driven paid advertising campaigns on Google Ads, Meta, and other platforms that bring quality leads and sales.',
-        features: ['Google Ads Management', 'Meta Ads Campaigns', 'Conversion Tracking', 'A/B Testing & Optimization'],
-    },
-];
-
-function ServicesSection() {
+function ServicesSection({ content }: { content: SiteContent['services'] }) {
     return (
         <section id="services" className="py-20 lg:py-28">
             <div className="mx-auto max-w-7xl px-6">
                 <div className="mx-auto mb-16 max-w-2xl text-center">
                     <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-sm font-medium text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
-                        Our Services
+                        {content.badge}
                     </div>
                     <h2 className="mb-4 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl dark:text-white">
-                        Everything You Need to <span className="text-sky-600 dark:text-sky-400">Grow Online</span>
+                        {content.title_prefix} <span className="text-sky-600 dark:text-sky-400">{content.title_highlight}</span>
                     </h2>
                     <p className="text-neutral-600 dark:text-neutral-400">
-                        We offer a comprehensive range of web development and digital marketing services to help your business succeed in the digital
-                        landscape.
+                        {content.description}
                     </p>
                 </div>
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {services.map((service) => {
-                        const Icon = service.icon;
+                    {content.items.map((service) => {
+                        const Icon = getIcon(service.icon);
                         return (
                             <div
                                 key={service.title}
@@ -374,42 +325,24 @@ function ServicesSection() {
     );
 }
 
-function TestimonialsSection() {
-    const testimonials = [
-        {
-            name: 'Rahul Sharma',
-            role: 'CEO, TechStore India',
-            text: 'Grow Ever built an incredible e-commerce platform for us. Our online sales increased by 200% within the first 3 months!',
-        },
-        {
-            name: 'Priya Patel',
-            role: 'Founder, StyleHub',
-            text: 'Their digital marketing team transformed our social media presence. We went from 500 to 15,000 followers in just 6 months.',
-        },
-        {
-            name: 'Amit Verma',
-            role: 'Director, CloudSync',
-            text: 'The custom web application they developed streamlined our operations completely. Professional, responsive, and highly skilled team.',
-        },
-    ];
-
+function TestimonialsSection({ content }: { content: SiteContent['testimonials'] }) {
     return (
         <section className="bg-neutral-50 py-20 lg:py-28 dark:bg-neutral-900/50">
             <div className="mx-auto max-w-7xl px-6">
                 <div className="mx-auto mb-16 max-w-2xl text-center">
                     <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-sm font-medium text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
-                        Testimonials
+                        {content.badge}
                     </div>
                     <h2 className="mb-4 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl dark:text-white">
-                        What Our <span className="text-sky-600 dark:text-sky-400">Clients Say</span>
+                        {content.title_prefix} <span className="text-sky-600 dark:text-sky-400">{content.title_highlight}</span>
                     </h2>
                 </div>
 
                 <div className="grid gap-8 md:grid-cols-3">
-                    {testimonials.map((t) => (
+                    {content.items.map((t) => (
                         <div key={t.name} className="rounded-2xl border border-neutral-200 bg-white p-8 dark:border-neutral-800 dark:bg-neutral-900">
                             <div className="mb-4 flex gap-1">
-                                {[...Array(5)].map((_, i) => (
+                                {[...Array(t.rating || 5)].map((_, i) => (
                                     <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                                 ))}
                             </div>
@@ -426,7 +359,7 @@ function TestimonialsSection() {
     );
 }
 
-function ContactSection() {
+function ContactSection({ content }: { content: SiteContent['contact'] }) {
     const [submitted, setSubmitted] = useState(false);
     const { data, setData, reset } = useForm({
         name: '',
@@ -447,13 +380,13 @@ function ContactSection() {
             <div className="mx-auto max-w-7xl px-6">
                 <div className="mx-auto mb-16 max-w-2xl text-center">
                     <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-sm font-medium text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300">
-                        Contact Us
+                        {content.badge}
                     </div>
                     <h2 className="mb-4 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl dark:text-white">
-                        Let&rsquo;s Build Something <span className="text-sky-600 dark:text-sky-400">Amazing Together</span>
+                        {content.title_prefix} <span className="text-sky-600 dark:text-sky-400">{content.title_highlight}</span>
                     </h2>
                     <p className="text-neutral-600 dark:text-neutral-400">
-                        Ready to take your business to the next level? Get in touch with us and let&rsquo;s discuss your project.
+                        {content.description}
                     </p>
                 </div>
 
@@ -466,7 +399,7 @@ function ContactSection() {
                                 </div>
                                 <div>
                                     <h4 className="font-semibold text-neutral-900 dark:text-white">Email Us</h4>
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">hello@growever.com</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{content.email}</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
@@ -475,7 +408,7 @@ function ContactSection() {
                                 </div>
                                 <div>
                                     <h4 className="font-semibold text-neutral-900 dark:text-white">Call Us</h4>
-                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">+91 98765 43210</p>
+                                    <p className="text-sm text-neutral-600 dark:text-neutral-400">{content.phone}</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
@@ -485,19 +418,18 @@ function ContactSection() {
                                 <div>
                                     <h4 className="font-semibold text-neutral-900 dark:text-white">Visit Us</h4>
                                     <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                                        Grow Ever Digital Agency
+                                        {content.address_title}
                                         <br />
-                                        India
+                                        {content.address_line}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 p-6 text-white">
-                            <h4 className="mb-2 text-lg font-bold">Free Consultation</h4>
+                            <h4 className="mb-2 text-lg font-bold">{content.consultation_title}</h4>
                             <p className="text-sm text-white/80">
-                                Not sure what you need? Book a free 30-minute consultation and we&rsquo;ll help you figure out the best strategy for
-                                your business.
+                                {content.consultation_text}
                             </p>
                         </div>
                     </div>
@@ -585,7 +517,7 @@ function ContactSection() {
     );
 }
 
-function Footer() {
+function Footer({ content }: { content: SiteContent['footer'] }) {
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -602,8 +534,7 @@ function Footer() {
                             Grow<span className="text-sky-400">Ever</span>
                         </div>
                         <p className="max-w-sm text-sm leading-relaxed text-neutral-400">
-                            Your trusted digital growth partner. We build modern web solutions and run result-driven marketing campaigns to help your
-                            business grow online.
+                            {content.description}
                         </p>
                     </div>
 
@@ -626,18 +557,16 @@ function Footer() {
                     <div>
                         <h4 className="mb-4 font-semibold">Services</h4>
                         <ul className="space-y-2">
-                            {['E-Commerce Development', 'Web Applications', 'SEO Optimization', 'Social Media Marketing', 'PPC Advertising'].map(
-                                (service) => (
-                                    <li key={service}>
-                                        <button
-                                            onClick={() => scrollTo('services')}
-                                            className="text-sm text-neutral-400 transition-colors hover:text-sky-400"
-                                        >
-                                            {service}
-                                        </button>
-                                    </li>
-                                ),
-                            )}
+                            {content.services_list.map((service) => (
+                                <li key={service}>
+                                    <button
+                                        onClick={() => scrollTo('services')}
+                                        className="text-sm text-neutral-400 transition-colors hover:text-sky-400"
+                                    >
+                                        {service}
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>
@@ -654,8 +583,8 @@ function Footer() {
     );
 }
 
-export default function Welcome({ canRegister = true }: { canRegister?: boolean }) {
-    const { auth } = usePage().props;
+export default function Welcome({ canRegister = true, siteContent }: { canRegister?: boolean; siteContent: SiteContent }) {
+    const { auth } = usePage().props as { auth?: { user: unknown } };
 
     return (
         <>
@@ -665,13 +594,13 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
             </Head>
 
             <div className="min-h-screen bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
-                <Navbar auth={auth as { user: unknown }} canRegister={canRegister} />
-                <HeroSection />
-                <AboutSection />
-                <ServicesSection />
-                <TestimonialsSection />
-                <ContactSection />
-                <Footer />
+                <Navbar auth={auth ?? { user: null }} canRegister={canRegister} />
+                {siteContent?.hero && <HeroSection content={siteContent.hero} />}
+                {siteContent?.about && <AboutSection content={siteContent.about} />}
+                {siteContent?.services && <ServicesSection content={siteContent.services} />}
+                {siteContent?.testimonials && <TestimonialsSection content={siteContent.testimonials} />}
+                {siteContent?.contact && <ContactSection content={siteContent.contact} />}
+                {siteContent?.footer && <Footer content={siteContent.footer} />}
             </div>
         </>
     );
