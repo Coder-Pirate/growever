@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-#[Fillable(['title', 'slug', 'description', 'image', 'category', 'client', 'url', 'technologies', 'status', 'sort_order'])]
+#[Fillable(['title', 'slug', 'description', 'images', 'category', 'client', 'url', 'technologies', 'status', 'sort_order'])]
 class Project extends Model
 {
     public const STATUSES = ['draft', 'published'];
@@ -22,6 +22,7 @@ class Project extends Model
 
     protected $casts = [
         'technologies' => 'array',
+        'images' => 'array',
     ];
 
     public static function booted(): void
@@ -29,6 +30,15 @@ class Project extends Model
         static::creating(function (Project $project) {
             if (empty($project->slug)) {
                 $project->slug = Str::slug($project->title);
+            }
+        });
+
+        static::deleting(function (Project $project) {
+            foreach ($project->images ?? [] as $path) {
+                $fullPath = public_path($path);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
         });
     }

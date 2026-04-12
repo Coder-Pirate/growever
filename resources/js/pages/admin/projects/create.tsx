@@ -1,6 +1,6 @@
-import { Head, useForm, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
+import { ArrowLeft, Plus, Upload, X } from 'lucide-react';
+import { useState, useRef } from 'react';
 
 type Props = {
     categories: string[];
@@ -8,11 +8,13 @@ type Props = {
 
 export default function CreateProject() {
     const { categories } = usePage<Props>().props;
-    const { data, setData, post, processing, errors } = useForm({
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { data, setData, processing, errors } = useForm({
         title: '',
         slug: '',
         description: '',
-        image: '',
         category: 'web-development',
         client: '',
         url: '',
@@ -42,9 +44,34 @@ export default function CreateProject() {
         }
     }
 
+    function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = Array.from(e.target.files || []);
+        setSelectedFiles((prev) => [...prev, ...files]);
+        const newPreviews = files.map((f) => URL.createObjectURL(f));
+        setPreviews((prev) => [...prev, ...newPreviews]);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+
+    function removeFile(index: number) {
+        URL.revokeObjectURL(previews[index]);
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+        setPreviews((prev) => prev.filter((_, i) => i !== index));
+    }
+
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        post('/admin/projects');
+        const formData = new FormData();
+        formData.append('title', data.title);
+        formData.append('slug', data.slug);
+        formData.append('description', data.description);
+        formData.append('category', data.category);
+        formData.append('client', data.client);
+        formData.append('url', data.url);
+        data.technologies.forEach((tech) => formData.append('technologies[]', tech));
+        formData.append('status', data.status);
+        formData.append('sort_order', String(data.sort_order));
+        selectedFiles.forEach((file) => formData.append('images[]', file));
+        router.post('/admin/projects', formData as any, { forceFormData: true });
     }
 
     function formatCategory(cat: string) {
@@ -108,17 +135,41 @@ export default function CreateProject() {
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="image" className="text-sm font-medium">
-                            Image URL <span className="text-muted-foreground">(optional)</span>
+                        <label className="text-sm font-medium">
+                            Images <span className="text-muted-foreground">(optional, max 5MB each)</span>
                         </label>
-                        <input
-                            id="image"
-                            type="text"
-                            value={data.image}
-                            onChange={(e) => setData('image', e.target.value)}
-                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                        />
-                        {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-input p-6 transition-colors hover:border-primary hover:bg-accent/50"
+                        >
+                            <Upload className="h-8 w-8 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">Click to upload images</p>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleFilesSelected}
+                                className="hidden"
+                            />
+                        </div>
+                        {previews.length > 0 && (
+                            <div className="grid grid-cols-3 gap-3 pt-2">
+                                {previews.map((src, i) => (
+                                    <div key={i} className="group relative">
+                                        <img src={src} alt="" className="h-28 w-full rounded-lg border object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFile(i)}
+                                            className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {errors['images.0'] && <p className="text-sm text-destructive">{errors['images.0']}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

@@ -1,5 +1,6 @@
-import { Head, useForm, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
+import { ArrowLeft, Upload, X } from 'lucide-react';
+import { useState, useRef } from 'react';
 
 type Blog = {
     id: number;
@@ -7,7 +8,7 @@ type Blog = {
     slug: string;
     excerpt: string | null;
     content: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     status: string;
 };
@@ -19,19 +20,53 @@ type Props = {
 
 export default function EditBlog() {
     const { blog, categories } = usePage<Props>().props;
-    const { data, setData, put, processing, errors } = useForm({
+    const [existingImages, setExistingImages] = useState<string[]>(blog.images || []);
+    const [removeImages, setRemoveImages] = useState<string[]>([]);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { data, setData, processing, errors } = useForm({
         title: blog.title,
         slug: blog.slug,
         excerpt: blog.excerpt || '',
         content: blog.content,
-        image: blog.image || '',
         category: blog.category,
         status: blog.status,
     });
 
+    function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = Array.from(e.target.files || []);
+        setSelectedFiles((prev) => [...prev, ...files]);
+        const newPreviews = files.map((f) => URL.createObjectURL(f));
+        setPreviews((prev) => [...prev, ...newPreviews]);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+
+    function removeNewFile(index: number) {
+        URL.revokeObjectURL(previews[index]);
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+        setPreviews((prev) => prev.filter((_, i) => i !== index));
+    }
+
+    function removeExistingImage(path: string) {
+        setExistingImages((prev) => prev.filter((p) => p !== path));
+        setRemoveImages((prev) => [...prev, path]);
+    }
+
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        put(`/admin/blogs/${blog.id}`);
+        const formData = new FormData();
+        formData.append('_method', 'PUT');
+        formData.append('title', data.title);
+        formData.append('slug', data.slug);
+        formData.append('excerpt', data.excerpt);
+        formData.append('content', data.content);
+        formData.append('category', data.category);
+        formData.append('status', data.status);
+        existingImages.forEach((img) => formData.append('existing_images[]', img));
+        removeImages.forEach((img) => formData.append('remove_images[]', img));
+        selectedFiles.forEach((file) => formData.append('images[]', file));
+        router.post(`/admin/blogs/${blog.id}`, formData as any, { forceFormData: true });
     }
 
     function formatCategory(cat: string) {
@@ -107,17 +142,66 @@ export default function EditBlog() {
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="image" className="text-sm font-medium">
-                            Image URL <span className="text-muted-foreground">(optional)</span>
+                        <label className="text-sm font-medium">
+                            Images <span className="text-muted-foreground">(optional, max 5MB each)</span>
                         </label>
-                        <input
-                            id="image"
-                            type="text"
-                            value={data.image}
-                            onChange={(e) => setData('image', e.target.value)}
-                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                        />
-                        {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
+
+                        {existingImages.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="text-xs text-muted-foreground">Current images:</p>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {existingImages.map((src) => (
+                                        <div key={src} className="group relative">
+                                            <img src={src} alt="" className="h-28 w-full rounded-lg border object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeExistingImage(src)}
+                                                className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-input p-6 transition-colors hover:border-primary hover:bg-accent/50"
+                        >
+                            <Upload className="h-8 w-8 text-muted-foreground" />
+                            <p className="text-sm text-muted-foreground">Click to upload more images</p>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleFilesSelected}
+                                className="hidden"
+                            />
+                        </div>
+
+                        {previews.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="text-xs text-muted-foreground">New images to upload:</p>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {previews.map((src, i) => (
+                                        <div key={i} className="group relative">
+                                            <img src={src} alt="" className="h-28 w-full rounded-lg border object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeNewFile(i)}
+                                                className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {errors['images.0'] && <p className="text-sm text-destructive">{errors['images.0']}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

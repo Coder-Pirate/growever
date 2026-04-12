@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Tag } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
 import PublicFooter from '@/components/public-footer';
+import ImageSlider from '@/components/image-slider';
 
 type Blog = {
     id: number;
@@ -9,7 +10,7 @@ type Blog = {
     slug: string;
     excerpt: string | null;
     content: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     published_at: string | null;
     created_at: string;
@@ -20,7 +21,7 @@ type RelatedBlog = {
     title: string;
     slug: string;
     excerpt: string | null;
-    image: string | null;
+    images: string[] | null;
     category: string;
     published_at: string | null;
 };
@@ -82,14 +83,10 @@ export default function BlogShow() {
                             )}
                         </header>
 
-                        {/* Featured image */}
-                        {blog.image && (
-                            <div className="mb-10 overflow-hidden rounded-2xl">
-                                <img
-                                    src={blog.image}
-                                    alt={blog.title}
-                                    className="w-full object-cover"
-                                />
+                        {/* Image slider */}
+                        {blog.images && blog.images.length > 0 && (
+                            <div className="mb-10">
+                                <ImageSlider images={blog.images} alt={blog.title} />
                             </div>
                         )}
 
@@ -116,10 +113,10 @@ export default function BlogShow() {
                                         href={`/blog/${post.slug}`}
                                         className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/5 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-sky-700"
                                     >
-                                        {post.image && (
+                                        {post.images && post.images.length > 0 && (
                                             <div className="aspect-video overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                                                 <img
-                                                    src={post.image}
+                                                    src={post.images[0]}
                                                     alt={post.title}
                                                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                 />

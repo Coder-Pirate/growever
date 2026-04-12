@@ -18,7 +18,7 @@ type Project = {
     title: string;
     slug: string;
     description: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     client: string | null;
     url: string | null;

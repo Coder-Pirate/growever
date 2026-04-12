@@ -61,7 +61,8 @@ class ProjectController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:projects'],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'string', 'max:500'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'max:5120'],
             'category' => ['required', Rule::in(Category::project()->pluck('slug')->toArray())],
             'client' => ['nullable', 'string', 'max:255'],
             'url' => ['nullable', 'url', 'max:500'],
@@ -74,6 +75,17 @@ class ProjectController extends Controller
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['title']);
         }
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $name = uniqid('project_') . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/projects'), $name);
+                $imagePaths[] = '/uploads/projects/' . $name;
+            }
+        }
+        $validated['images'] = $imagePaths ?: null;
+        unset($validated['images.*']);
 
         Project::create($validated);
 
@@ -94,7 +106,12 @@ class ProjectController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('projects')->ignore($project->id)],
             'description' => ['required', 'string'],
-            'image' => ['nullable', 'string', 'max:500'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'max:5120'],
+            'existing_images' => ['nullable', 'array'],
+            'existing_images.*' => ['string'],
+            'remove_images' => ['nullable', 'array'],
+            'remove_images.*' => ['string'],
             'category' => ['required', Rule::in(Category::project()->pluck('slug')->toArray())],
             'client' => ['nullable', 'string', 'max:255'],
             'url' => ['nullable', 'url', 'max:500'],
@@ -107,6 +124,33 @@ class ProjectController extends Controller
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['title']);
         }
+
+        // Remove specified images from disk
+        $removeImages = $validated['remove_images'] ?? [];
+        foreach ($removeImages as $path) {
+            $fullPath = public_path(ltrim($path, '/'));
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
+
+        // Keep existing images that weren't removed
+        $existingImages = $validated['existing_images'] ?? [];
+        $existingImages = array_diff($existingImages, $removeImages);
+
+        // Upload new images
+        $newImagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $name = uniqid('project_') . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/projects'), $name);
+                $newImagePaths[] = '/uploads/projects/' . $name;
+            }
+        }
+
+        $allImages = array_values(array_merge($existingImages, $newImagePaths));
+        $validated['images'] = $allImages ?: null;
+        unset($validated['images.*'], $validated['existing_images'], $validated['existing_images.*'], $validated['remove_images'], $validated['remove_images.*']);
 
         $project->update($validated);
 

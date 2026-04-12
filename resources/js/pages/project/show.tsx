@@ -2,13 +2,14 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import PublicNavbar from '@/components/public-navbar';
 import PublicFooter from '@/components/public-footer';
+import ImageSlider from '@/components/image-slider';
 
 type Project = {
     id: number;
     title: string;
     slug: string;
     description: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     client: string | null;
     url: string | null;
@@ -21,7 +22,7 @@ type RelatedProject = {
     title: string;
     slug: string;
     description: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     client: string | null;
     technologies: string[] | null;
@@ -79,14 +80,10 @@ export default function ProjectShow() {
                             </h1>
                         </header>
 
-                        {/* Featured image */}
-                        {project.image && (
-                            <div className="mb-10 overflow-hidden rounded-2xl">
-                                <img
-                                    src={project.image}
-                                    alt={project.title}
-                                    className="w-full object-cover"
-                                />
+                        {/* Image slider */}
+                        {project.images && project.images.length > 0 && (
+                            <div className="mb-10">
+                                <ImageSlider images={project.images} alt={project.title} />
                             </div>
                         )}
 
@@ -173,10 +170,10 @@ export default function ProjectShow() {
                                         href={`/project/${p.slug}`}
                                         className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/5 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-sky-700"
                                     >
-                                        {p.image && (
+                                        {p.images && p.images.length > 0 && (
                                             <div className="aspect-video overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                                                 <img
-                                                    src={p.image}
+                                                    src={p.images[0]}
                                                     alt={p.title}
                                                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                 />

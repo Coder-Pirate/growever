@@ -8,7 +8,7 @@ type Project = {
     title: string;
     slug: string;
     description: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     client: string | null;
     url: string | null;
@@ -92,10 +92,10 @@ export default function ProjectsIndex() {
                                     href={`/project/${project.slug}`}
                                     className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/5 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-sky-700"
                                 >
-                                    {project.image && (
+                                    {project.images && project.images.length > 0 && (
                                         <div className="aspect-video overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                                             <img
-                                                src={project.image}
+                                                src={project.images[0]}
                                                 alt={project.title}
                                                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                             />

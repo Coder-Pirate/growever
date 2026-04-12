@@ -61,7 +61,8 @@ class BlogController extends Controller
             'slug' => ['nullable', 'string', 'max:255', 'unique:blogs'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
-            'image' => ['nullable', 'string', 'max:500'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'max:5120'],
             'category' => ['required', Rule::in(Category::blog()->pluck('slug')->toArray())],
             'status' => ['required', Rule::in(Blog::STATUSES)],
         ]);
@@ -73,6 +74,17 @@ class BlogController extends Controller
         if ($validated['status'] === 'published') {
             $validated['published_at'] = now();
         }
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $name = uniqid('blog_') . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/blogs'), $name);
+                $imagePaths[] = '/uploads/blogs/' . $name;
+            }
+        }
+        $validated['images'] = $imagePaths ?: null;
+        unset($validated['images.*']);
 
         Blog::create($validated);
 
@@ -94,7 +106,12 @@ class BlogController extends Controller
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('blogs')->ignore($blog->id)],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
-            'image' => ['nullable', 'string', 'max:500'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'max:5120'],
+            'existing_images' => ['nullable', 'array'],
+            'existing_images.*' => ['string'],
+            'remove_images' => ['nullable', 'array'],
+            'remove_images.*' => ['string'],
             'category' => ['required', Rule::in(Category::blog()->pluck('slug')->toArray())],
             'status' => ['required', Rule::in(Blog::STATUSES)],
         ]);
@@ -106,6 +123,33 @@ class BlogController extends Controller
         if ($validated['status'] === 'published' && ! $blog->published_at) {
             $validated['published_at'] = now();
         }
+
+        // Remove specified images from disk
+        $removeImages = $validated['remove_images'] ?? [];
+        foreach ($removeImages as $path) {
+            $fullPath = public_path(ltrim($path, '/'));
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
+
+        // Keep existing images that weren't removed
+        $existingImages = $validated['existing_images'] ?? [];
+        $existingImages = array_diff($existingImages, $removeImages);
+
+        // Upload new images
+        $newImagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $name = uniqid('blog_') . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/blogs'), $name);
+                $newImagePaths[] = '/uploads/blogs/' . $name;
+            }
+        }
+
+        $allImages = array_values(array_merge($existingImages, $newImagePaths));
+        $validated['images'] = $allImages ?: null;
+        unset($validated['images.*'], $validated['existing_images'], $validated['existing_images.*'], $validated['remove_images'], $validated['remove_images.*']);
 
         $blog->update($validated);
 

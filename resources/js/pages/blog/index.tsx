@@ -9,7 +9,7 @@ type Blog = {
     slug: string;
     excerpt: string | null;
     content: string;
-    image: string | null;
+    images: string[] | null;
     category: string;
     published_at: string | null;
 };
@@ -91,10 +91,10 @@ export default function BlogsIndex() {
                                     href={`/blog/${blog.slug}`}
                                     className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/5 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-sky-700"
                                 >
-                                    {blog.image && (
+                                    {blog.images && blog.images.length > 0 && (
                                         <div className="aspect-video overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                                             <img
-                                                src={blog.image}
+                                                src={blog.images[0]}
                                                 alt={blog.title}
                                                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                             />
