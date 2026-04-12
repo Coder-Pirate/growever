@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { useState, FormEvent } from 'react';
 import { CheckCircle2, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { toast } from 'sonner';
 import type {
     SiteContent,
     HeroContent,
@@ -157,7 +158,7 @@ function HeroForm({ data: initial }: { data: HeroContent }) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        put('/admin/site-content/hero');
+        put('/admin/site-content/hero', { onSuccess: () => toast.success('Hero section updated successfully.') });
     };
 
     return (
@@ -242,7 +243,7 @@ function AboutForm({ data: initial }: { data: AboutContent }) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        put('/admin/site-content/about');
+        put('/admin/site-content/about', { onSuccess: () => toast.success('About section updated successfully.') });
     };
 
     return (
@@ -355,7 +356,7 @@ function ServicesForm({ data: initial }: { data: ServicesContent }) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        put('/admin/site-content/services');
+        put('/admin/site-content/services', { onSuccess: () => toast.success('Services section updated successfully.') });
     };
 
     return (
@@ -441,7 +442,7 @@ function TestimonialsForm({ data: initial }: { data: TestimonialsContent }) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        put('/admin/site-content/testimonials');
+        put('/admin/site-content/testimonials', { onSuccess: () => toast.success('Testimonials section updated successfully.') });
     };
 
     return (
@@ -502,7 +503,7 @@ function ContactForm({ data: initial }: { data: ContactContent }) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        put('/admin/site-content/contact');
+        put('/admin/site-content/contact', { onSuccess: () => toast.success('Contact section updated successfully.') });
     };
 
     return (
@@ -553,7 +554,7 @@ function FooterForm({ data: initial }: { data: FooterContent }) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        put('/admin/site-content/footer');
+        put('/admin/site-content/footer', { onSuccess: () => toast.success('Footer section updated successfully.') });
     };
 
     return (
@@ -589,7 +590,7 @@ type Props = {
 };
 
 export default function SiteContentPage() {
-    const { sections, flash } = usePage<Props & { flash: { success: string | null } }>().props;
+    const { sections } = usePage<Props>().props;
     const [openSection, setOpenSection] = useState<string | null>('hero');
 
     const toggle = (section: string) => {
@@ -604,13 +605,6 @@ export default function SiteContentPage() {
                     <h2 className="text-2xl font-bold tracking-tight">Site Content</h2>
                     <p className="text-muted-foreground">Manage all content displayed on the landing page.</p>
                 </div>
-
-                {flash?.success && (
-                    <div className="flex items-center gap-2 rounded-lg bg-emerald-50 p-4 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                        <CheckCircle2 className="h-5 w-5" />
-                        {flash.success}
-                    </div>
-                )}
 
                 <div className="space-y-4">
                     {sections?.hero && (
