@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,10 +38,12 @@ class ProjectController extends Controller
 
         $projects = $query->orderBy('sort_order')->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
+        $categories = Category::project()->pluck('slug')->toArray();
+
         return Inertia::render('admin/projects/index', [
             'projects' => $projects,
             'filters' => $request->only(['search', 'status', 'category', 'perPage']),
-            'categories' => Project::CATEGORIES,
+            'categories' => $categories,
             'statuses' => Project::STATUSES,
         ]);
     }
@@ -48,7 +51,7 @@ class ProjectController extends Controller
     public function create(): Response
     {
         return Inertia::render('admin/projects/create', [
-            'categories' => Project::CATEGORIES,
+            'categories' => Category::project()->pluck('slug')->toArray(),
         ]);
     }
 
@@ -59,7 +62,7 @@ class ProjectController extends Controller
             'slug' => ['nullable', 'string', 'max:255', 'unique:projects'],
             'description' => ['required', 'string'],
             'image' => ['nullable', 'string', 'max:500'],
-            'category' => ['required', Rule::in(Project::CATEGORIES)],
+            'category' => ['required', Rule::in(Category::project()->pluck('slug')->toArray())],
             'client' => ['nullable', 'string', 'max:255'],
             'url' => ['nullable', 'url', 'max:500'],
             'technologies' => ['nullable', 'array'],
@@ -81,7 +84,7 @@ class ProjectController extends Controller
     {
         return Inertia::render('admin/projects/edit', [
             'project' => $project,
-            'categories' => Project::CATEGORIES,
+            'categories' => Category::project()->pluck('slug')->toArray(),
         ]);
     }
 
@@ -92,7 +95,7 @@ class ProjectController extends Controller
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('projects')->ignore($project->id)],
             'description' => ['required', 'string'],
             'image' => ['nullable', 'string', 'max:500'],
-            'category' => ['required', Rule::in(Project::CATEGORIES)],
+            'category' => ['required', Rule::in(Category::project()->pluck('slug')->toArray())],
             'client' => ['nullable', 'string', 'max:255'],
             'url' => ['nullable', 'url', 'max:500'],
             'technologies' => ['nullable', 'array'],

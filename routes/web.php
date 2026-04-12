@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportUsersController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Models\Blog;
+use App\Models\Category;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -50,7 +52,7 @@ Route::get('/blogs', function (\Illuminate\Http\Request $request) {
 
     return Inertia\Inertia::render('blog/index', [
         'blogs' => $blogs,
-        'categories' => Blog::CATEGORIES,
+        'categories' => Category::blog()->pluck('slug')->toArray(),
         'currentCategory' => $category ?? '',
     ]);
 })->name('blogs.index');
@@ -65,7 +67,7 @@ Route::get('/projects', function (\Illuminate\Http\Request $request) {
 
     return Inertia\Inertia::render('project/index', [
         'projects' => $projects,
-        'categories' => Project::CATEGORIES,
+        'categories' => Category::project()->pluck('slug')->toArray(),
         'currentCategory' => $category ?? '',
     ]);
 })->name('projects.index');
@@ -119,6 +121,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('users/export/excel', [ExportUsersController::class, 'excel'])->name('users.export.excel');
     Route::get('users/export/pdf', [ExportUsersController::class, 'pdf'])->name('users.export.pdf');
     Route::resource('users', UserController::class)->except(['show']);
+    Route::resource('categories', CategoryController::class)->except(['show']);
     Route::resource('blogs', BlogController::class)->except(['show']);
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::get('site-content', [SiteContentController::class, 'index'])->name('site-content.index');

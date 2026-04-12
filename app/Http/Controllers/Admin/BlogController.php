@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -36,10 +37,12 @@ class BlogController extends Controller
 
         $blogs = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
+        $categories = Category::blog()->pluck('slug')->toArray();
+
         return Inertia::render('admin/blogs/index', [
             'blogs' => $blogs,
             'filters' => $request->only(['search', 'status', 'category', 'perPage']),
-            'categories' => Blog::CATEGORIES,
+            'categories' => $categories,
             'statuses' => Blog::STATUSES,
         ]);
     }
@@ -47,7 +50,7 @@ class BlogController extends Controller
     public function create(): Response
     {
         return Inertia::render('admin/blogs/create', [
-            'categories' => Blog::CATEGORIES,
+            'categories' => Category::blog()->pluck('slug')->toArray(),
         ]);
     }
 
@@ -59,7 +62,7 @@ class BlogController extends Controller
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
             'image' => ['nullable', 'string', 'max:500'],
-            'category' => ['required', Rule::in(Blog::CATEGORIES)],
+            'category' => ['required', Rule::in(Category::blog()->pluck('slug')->toArray())],
             'status' => ['required', Rule::in(Blog::STATUSES)],
         ]);
 
@@ -80,7 +83,7 @@ class BlogController extends Controller
     {
         return Inertia::render('admin/blogs/edit', [
             'blog' => $blog,
-            'categories' => Blog::CATEGORIES,
+            'categories' => Category::blog()->pluck('slug')->toArray(),
         ]);
     }
 
@@ -92,7 +95,7 @@ class BlogController extends Controller
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
             'image' => ['nullable', 'string', 'max:500'],
-            'category' => ['required', Rule::in(Blog::CATEGORIES)],
+            'category' => ['required', Rule::in(Category::blog()->pluck('slug')->toArray())],
             'status' => ['required', Rule::in(Blog::STATUSES)],
         ]);
 
