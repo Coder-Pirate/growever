@@ -10,6 +10,7 @@ import type {
     TestimonialsContent,
     ContactContent,
     FooterContent,
+    SettingsContent,
     ServiceItem,
     TestimonialItem,
 } from '@/types/site-content';
@@ -585,6 +586,41 @@ function FooterForm({ data: initial }: { data: FooterContent }) {
 }
 
 // ============ MAIN PAGE ============
+
+// ============ SETTINGS FORM ============
+function SettingsForm({ data: initial }: { data: SettingsContent }) {
+    const { data, setData, put, processing } = useForm({ content: { ...initial } });
+    const update = (key: string, value: string) => setData('content', { ...data.content, [key]: value } as any);
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        put('/admin/site-content/settings', { onSuccess: () => toast.success('Settings updated successfully.') });
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+                <TextInput label="Google Tag Manager ID" value={data.content.gtm_id} onChange={(v) => update('gtm_id', v)} placeholder="GTM-XXXXXXX" />
+                <p className="text-xs text-muted-foreground">Enter your GTM container ID (e.g. GTM-XXXXXXX). Leave empty to disable tracking.</p>
+            </div>
+            <hr className="my-2" />
+            <div className="space-y-1">
+                <TextInput label="Meta Pixel ID" value={data.content.meta_pixel_id} onChange={(v) => update('meta_pixel_id', v)} placeholder="123456789012345" />
+                <p className="text-xs text-muted-foreground">Enter your Meta (Facebook) Pixel ID. Leave empty to disable.</p>
+            </div>
+            <div className="space-y-1">
+                <TextInput label="Meta Conversions API Access Token" value={data.content.meta_pixel_access_token} onChange={(v) => update('meta_pixel_access_token', v)} placeholder="EAAxxxxxxx..." />
+                <p className="text-xs text-muted-foreground">Required for server-side event tracking. Generate from Meta Events Manager → Settings → Conversions API.</p>
+            </div>
+            <hr className="my-2" />
+            <TextArea label="Meta Description" value={data.content.meta_description} onChange={(v) => update('meta_description', v)} rows={2} />
+            <TextInput label="Meta Keywords" value={data.content.meta_keywords} onChange={(v) => update('meta_keywords', v)} placeholder="keyword1, keyword2, keyword3" />
+            <SaveButton processing={processing} />
+        </form>
+    );
+}
+
+// ============ MAIN PAGE ============
 type Props = {
     sections: SiteContent;
 };
@@ -640,6 +676,12 @@ export default function SiteContentPage() {
                     {sections?.footer && (
                         <SectionWrapper title="Footer Section" description="Footer description and services list" open={openSection === 'footer'} onToggle={() => toggle('footer')}>
                             <FooterForm data={sections.footer} />
+                        </SectionWrapper>
+                    )}
+
+                    {sections?.settings && (
+                        <SectionWrapper title="Settings" description="Google Tag Manager, meta tags, and site-wide settings" open={openSection === 'settings'} onToggle={() => toggle('settings')}>
+                            <SettingsForm data={sections.settings} />
                         </SectionWrapper>
                     )}
                 </div>

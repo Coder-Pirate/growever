@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportUsersController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Models\Blog;
 use App\Models\Category;
@@ -41,6 +43,8 @@ Route::get('/contact', function () {
         'contact' => $content['contact'],
     ]);
 })->name('contact');
+
+Route::post('/contact', [ContactMessageController::class, 'store'])->name('contact.store');
 
 Route::get('/blogs', function (\Illuminate\Http\Request $request) {
     $category = $request->query('category');
@@ -126,6 +130,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::resource('projects', ProjectController::class)->except(['show']);
     Route::get('site-content', [SiteContentController::class, 'index'])->name('site-content.index');
     Route::put('site-content/{section}', [SiteContentController::class, 'update'])->name('site-content.update');
+    Route::resource('messages', AdminContactMessageController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
 });
 
 // Manager routes

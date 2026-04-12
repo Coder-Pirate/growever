@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -43,3 +43,17 @@ createInertiaApp({
 
 // This will set light / dark mode on load...
 initializeTheme();
+
+// Push virtual pageview to GTM dataLayer and Meta Pixel on every Inertia navigation
+router.on('navigate', (event) => {
+    const w = window as any;
+    if (w.dataLayer) {
+        w.dataLayer.push({
+            event: 'virtualPageview',
+            page: event.detail.page.url,
+        });
+    }
+    if (typeof w.fbq === 'function') {
+        w.fbq('track', 'PageView');
+    }
+});

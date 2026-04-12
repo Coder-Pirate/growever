@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Shield, Users, UserCheck, FileEdit, Newspaper, FolderOpen, Tags } from 'lucide-react';
+import { LayoutGrid, Shield, Users, UserCheck, FileEdit, Newspaper, FolderOpen, Tags, MessageSquare } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -25,6 +25,7 @@ function getNavItems(role: UserRole): NavItem[] {
                 { title: 'Categories', href: '/admin/categories', icon: Tags },
                 { title: 'Blogs', href: '/admin/blogs', icon: Newspaper },
                 { title: 'Projects', href: '/admin/projects', icon: FolderOpen },
+                { title: 'Messages', href: '/admin/messages', icon: MessageSquare },
                 { title: 'Site Content', href: '/admin/site-content', icon: FileEdit },
             ];
         case 'manager':

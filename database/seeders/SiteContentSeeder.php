@@ -138,6 +138,13 @@ class SiteContentSeeder extends Seeder
                     'PPC Advertising',
                 ],
             ],
+            'settings' => [
+                'gtm_id' => '',
+                'meta_pixel_id' => '',
+                'meta_pixel_access_token' => '',
+                'meta_description' => 'GrowEver - Your trusted digital growth partner for web development, SEO, and digital marketing.',
+                'meta_keywords' => 'web development, SEO, digital marketing, e-commerce, social media',
+            ],
         ];
 
         foreach ($sections as $section => $content) {

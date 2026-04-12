@@ -19,7 +19,7 @@ class SiteContentController extends Controller
 
     public function update(Request $request, string $section): \Illuminate\Http\RedirectResponse
     {
-        $allowedSections = ['hero', 'about', 'services', 'testimonials', 'contact', 'footer'];
+        $allowedSections = ['hero', 'about', 'services', 'testimonials', 'contact', 'footer', 'settings'];
 
         if (! in_array($section, $allowedSections, true)) {
             abort(404);

@@ -68,6 +68,14 @@ export type FooterContent = {
     services_list: string[];
 };
 
+export type SettingsContent = {
+    gtm_id: string;
+    meta_pixel_id: string;
+    meta_pixel_access_token: string;
+    meta_description: string;
+    meta_keywords: string;
+};
+
 export type SiteContent = {
     hero: HeroContent;
     about: AboutContent;
@@ -75,4 +83,5 @@ export type SiteContent = {
     testimonials: TestimonialsContent;
     contact: ContactContent;
     footer: FooterContent;
+    settings: SettingsContent;
 };
