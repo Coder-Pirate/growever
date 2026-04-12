@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('excerpt')->nullable();
             $table->longText('content');
-            $table->string('image')->nullable();
+            $table->json('images')->nullable();
             $table->string('category')->default('general');
             $table->enum('status', ['draft', 'published'])->default('draft');
             $table->timestamp('published_at')->nullable();

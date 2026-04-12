@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
-            $table->string('image')->nullable();
+            $table->json('images')->nullable();
             $table->string('category')->default('web-development');
             $table->string('client')->nullable();
             $table->string('url')->nullable();

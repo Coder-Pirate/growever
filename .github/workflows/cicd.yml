@@ -73,16 +73,16 @@ jobs:
       - name: Build NPM Assets
         run: npm run build
 
-      # - name: Remove Old Build Files on Server
-      #   uses: appleboy/ssh-action@v0.1.6
-      #   with:
-      #     host: ${{ secrets.VPS_HOST }}
-      #     username: ${{ secrets.VPS_USER }}
-      #     password: ${{ secrets.VPS_PASSWORD }}
-      #     script: |
-      #       rm -rf /var/www/html/growever/public/build
-      #       rm -rf /var/www/html/growever/bootstrap/cache/*.php
-      #       rm -rf /var/www/html/growever/database/migrations/*.php
+      - name: Remove Old Build Files on Server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            rm -rf /var/www/html/growever/public/build
+            rm -rf /var/www/html/growever/bootstrap/cache/*.php
+            rm -rf /var/www/html/growever/database/migrations/*.php
 
       - name: Synchronize Files To Server
         uses: appleboy/scp-action@v0.1.1
