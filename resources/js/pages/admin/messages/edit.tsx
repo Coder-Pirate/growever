@@ -89,7 +89,7 @@ export default function MessageEdit() {
                                 value={data.phone}
                                 onChange={(e) => setData('phone', e.target.value)}
                                 className="w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                                placeholder="+91 98765 43210"
+                                placeholder="+880 1XXX XXXXXX"
                             />
                             {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}
                         </div>

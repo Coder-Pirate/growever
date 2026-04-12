@@ -161,15 +161,16 @@ export default function Contact() {
                                     </div>
                                     <div className="mt-5">
                                         <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                                            Phone Number <span className="text-neutral-400">(optional)</span>
+                                            Phone Number
                                         </label>
                                         <input
                                             id="phone"
                                             type="tel"
+                                            required
                                             value={data.phone}
                                             onChange={(e) => setData('phone', e.target.value)}
                                             className="w-full rounded-lg border border-neutral-300 bg-transparent px-4 py-2.5 text-sm outline-none transition-colors focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-neutral-700"
-                                            placeholder="+91 98765 43210"
+                                            placeholder="+880 1XXX XXXXXX"
                                         />
                                         {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
                                     </div>

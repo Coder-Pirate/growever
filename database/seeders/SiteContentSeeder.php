@@ -98,7 +98,7 @@ class SiteContentSeeder extends Seeder
                 'items' => [
                     [
                         'name' => 'Rahul Sharma',
-                        'role' => 'CEO, TechStore India',
+                        'role' => 'CEO, TechStore Bangladesh',
                         'text' => 'Grow Ever built an incredible e-commerce platform for us. Our online sales increased by 200% within the first 3 months!',
                         'rating' => 5,
                     ],
@@ -122,9 +122,9 @@ class SiteContentSeeder extends Seeder
                 'title_highlight' => 'Amazing Together',
                 'description' => "Ready to take your business to the next level? Get in touch with us and let's discuss your project.",
                 'email' => 'hello@growever.com',
-                'phone' => '+91 98765 43210',
+                'phone' => '+880 1XXX XXXXXX',
                 'address_title' => 'Grow Ever Digital Agency',
-                'address_line' => 'India',
+                'address_line' => 'Dhaka, Bangladesh',
                 'consultation_title' => 'Free Consultation',
                 'consultation_text' => "Not sure what you need? Book a free 30-minute consultation and we'll help you figure out the best strategy for your business.",
             ],
